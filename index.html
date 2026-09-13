@@ -561,7 +561,7 @@
     const now = new Date();
     const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
     const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const today = new Date(birthdayYear, now.getMonth(), now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
 
     const params = new URLSearchParams(window.location.search);
@@ -615,33 +615,33 @@
       tile.classList.toggle('is-active', tile.dataset.day === activeDay);
     });
   };
+  const updateActiveDayTile = () => {
+    let activeSection = null;
+    daySections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+      if (!visible) return;
+      const distanceFromFocus = Math.abs((rect.top + rect.height / 2) - window.innerHeight * 0.4);
+      if (!activeSection || distanceFromFocus < activeSection.distance){
+        activeSection = { day: section.dataset.day, distance: distanceFromFocus };
+      }
+    });
+    if (activeSection) setActiveTile(activeSection.day);
+  };
 
   if ('IntersectionObserver' in window){
     const sectionObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting){
           entry.target.classList.add('in-view');
-          setActiveTile(entry.target.dataset.day);
         }
       });
+      updateActiveDayTile();
     }, { threshold: 0.35 });
 
     daySections.forEach(section => sectionObserver.observe(section));
   } else {
     document.querySelectorAll('section').forEach(section => section.classList.add('in-view'));
-    const updateActiveDayTile = () => {
-      let activeSection = null;
-      daySections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
-        if (!visible) return;
-        const distanceFromFocus = Math.abs(rect.top - window.innerHeight * 0.28);
-        if (!activeSection || distanceFromFocus < activeSection.distance){
-          activeSection = { day: section.dataset.day, distance: distanceFromFocus };
-        }
-      });
-      if (activeSection) setActiveTile(activeSection.day);
-    };
     updateActiveDayTile();
     if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, { passive: true });
   }

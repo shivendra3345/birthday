@@ -205,8 +205,12 @@
   .wish-reveal .sign{ display:block; margin-top:10px; font-family:'Caveat', cursive; font-size:19px; color:var(--rust); }
 
   /* ---------------- MENU (flip cards) ---------------- */
-  .menu-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:22px; }
-  @media (max-width:560px){ .menu-grid{ grid-template-columns:repeat(2,1fr); } }
+  .menu-section .ticket-card{ max-width:780px; }
+  .menu-grid{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:18px; margin-top:22px; align-items:stretch;
+  }
+  @media (max-width:560px){ .menu-grid{ grid-template-columns:1fr; } }
   .flip-card{
     perspective:1000px; height:170px; padding:0; border:none; background:none; width:100%;
     text-align:inherit;
@@ -325,12 +329,12 @@
 <div class="progress-pill"><span class="mono" id="unlockStatus">Checking surprises...</span><span class="progress-preview" id="previewBadge" hidden>preview mode</span></div>
 <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
 
-<section class="hero">
+<section class="hero in-view">
   <div class="ticket-code mono">TICKET NO. 09-17 &middot; ONE PASSENGER</div>
   <h1>One ticket, just for you.</h1>
   <p>This unlocks in pieces — a little more each day until the 17th. Check back daily.</p>
   <div class="hero-actions">
-    <button class="hero-btn" id="jumpToToday" type="button">Open today&apos;s surprise</button>
+    <button class="hero-btn" id="jumpToToday" type="button">Open the latest surprise</button>
     <a class="ghost-link mono" href="?preview=all">preview every day</a>
   </div>
   <div class="calendar-strip" id="calendarStrip">
@@ -554,9 +558,11 @@
 
   // Day-by-day unlock logic (Sep 13 -> Sep 17)
   (function(){
+    const birthdayYear = 2026;
+    const birthdayMonthIndex = 8;
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dayDates = [13,14,15,16,17].map(d => new Date(now.getFullYear(), 8, d)); // September
+    const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
 
     const params = new URLSearchParams(window.location.search);
     const previewAll = params.get('preview') === 'all';
@@ -615,7 +621,7 @@
       });
     }, { threshold: 0.35 });
 
-    document.querySelectorAll('section').forEach(section => sectionObserver.observe(section));
+    document.querySelectorAll('section[data-day]').forEach(section => sectionObserver.observe(section));
   } else {
     document.querySelectorAll('section').forEach(section => section.classList.add('in-view'));
   }

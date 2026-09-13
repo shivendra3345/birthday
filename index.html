@@ -325,7 +325,7 @@
   }
 </style>
 </head>
-<body>
+<body data-birthday-year="2026" data-birthday-month="9">
 <div class="progress-pill"><span class="mono" id="unlockStatus">Checking surprises...</span><span class="progress-preview" id="previewBadge" hidden>preview mode</span></div>
 <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
 
@@ -354,11 +354,11 @@
     <p class="sub">Tap each candle to blow it out.</p>
     <div class="cake-stage">
       <div class="candles" id="candles">
-        <button class="candle-btn" data-i="0"><div class="flame"></div><div class="candle-stick"></div></button>
-        <button class="candle-btn" data-i="1"><div class="flame"></div><div class="candle-stick"></div></button>
-        <button class="candle-btn" data-i="2"><div class="flame"></div><div class="candle-stick"></div></button>
-        <button class="candle-btn" data-i="3"><div class="flame"></div><div class="candle-stick"></div></button>
-        <button class="candle-btn" data-i="4"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="0" aria-label="Blow out candle 1"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="1" aria-label="Blow out candle 2"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="2" aria-label="Blow out candle 3"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="3" aria-label="Blow out candle 4"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="4" aria-label="Blow out candle 5"><div class="flame"></div><div class="candle-stick"></div></button>
       </div>
       <svg class="cake-svg" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
         <rect x="40" y="90" width="220" height="50" rx="6" fill="#FBF3E1" stroke="#22302B" stroke-opacity="0.2"/>
@@ -388,37 +388,37 @@
     <p class="sub">Tap a card to flip it.</p>
     <div class="menu-grid">
 
-      <button class="flip-card" type="button" aria-label="Flip Glazed donut memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Glazed donut memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍩</div><div class="title">Glazed donut</div></div>
         <div class="flip-face flip-back"><p>Dunkin, always the glazed one. Non-negotiable.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip Sushi memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Sushi memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍣</div><div class="title">Sushi</div></div>
         <div class="flip-face flip-back"><p>The place on McMillan Street. She'd pick it every time.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip Cheesecake memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Cheesecake memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍰</div><div class="title">Cheesecake</div></div>
         <div class="flip-face flip-back"><p>Or tiramisu, depending on her mood that day.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip The usual stores memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip The usual stores memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🛒</div><div class="title">The usual stores</div></div>
         <div class="flip-face flip-back"><p>Trader Joe's, Target, Kenwood — a full afternoon, every time.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip Ice cream memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Ice cream memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍦</div><div class="title">Ice cream</div></div>
         <div class="flip-face flip-back"><p>Downtown, after a day of walking around Cincinnati.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip Movie nights memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Movie nights memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🎬</div><div class="title">Movie nights</div></div>
         <div class="flip-face flip-back"><p>Musafir Cafe — "musafir" means traveler, which tracks. Jab Tak Hai Jaan for when a good cry is on the agenda.</p></div>
       </div></button>
 
-      <button class="flip-card" type="button" aria-label="Flip Her go-to drink memory card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip Her go-to drink memory card" aria-pressed="false"><div class="flip-inner">
         <div class="flip-face"><div class="icon">❓</div><div class="title">Her go-to drink</div></div>
         <div class="flip-face flip-back"><p>Still don't remember what it's called. Ask me again and I'll get it wrong.</p></div>
       </div></button>
@@ -558,9 +558,9 @@
 
   // Day-by-day unlock logic (Sep 13 -> Sep 17)
   (function(){
-    const birthdayYear = 2026;
-    const birthdayMonthIndex = 8;
     const now = new Date();
+    const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
+    const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
 
@@ -609,21 +609,41 @@
   })();
 
   // Reveal sections and highlight the active tile on scroll
+  const daySections = Array.from(document.querySelectorAll('section[data-day]'));
+  const setActiveTile = activeDay => {
+    document.querySelectorAll('.cal-tile').forEach(tile => {
+      tile.classList.toggle('is-active', tile.dataset.day === activeDay);
+    });
+  };
+
   if ('IntersectionObserver' in window){
     const sectionObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting){
           entry.target.classList.add('in-view');
-          document.querySelectorAll('.cal-tile').forEach(tile => {
-            tile.classList.toggle('is-active', tile.dataset.day === entry.target.dataset.day);
-          });
+          setActiveTile(entry.target.dataset.day);
         }
       });
     }, { threshold: 0.35 });
 
-    document.querySelectorAll('section[data-day]').forEach(section => sectionObserver.observe(section));
+    daySections.forEach(section => sectionObserver.observe(section));
   } else {
     document.querySelectorAll('section').forEach(section => section.classList.add('in-view'));
+    const updateActiveDayTile = () => {
+      let activeSection = null;
+      daySections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        const visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!visible) return;
+        const distanceFromFocus = Math.abs(rect.top - window.innerHeight * 0.28);
+        if (!activeSection || distanceFromFocus < activeSection.distance){
+          activeSection = { day: section.dataset.day, distance: distanceFromFocus };
+        }
+      });
+      if (activeSection) setActiveTile(activeSection.day);
+    };
+    updateActiveDayTile();
+    if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, { passive: true });
   }
 
   // Candles
@@ -636,6 +656,7 @@
     btn.addEventListener('click', () => {
       if (btn.classList.contains('out')) return;
       btn.classList.add('out');
+      btn.disabled = true;
       blownOut++;
       const remaining = candleButtons.length - blownOut;
       cakeHint.textContent = remaining > 0 ? remaining + ' candle' + (remaining === 1 ? '' : 's') + ' left' : 'Wish made.';
@@ -648,7 +669,10 @@
 
   // Flip cards
   document.querySelectorAll('.flip-card').forEach(card => {
-    card.addEventListener('click', () => card.classList.toggle('flipped'));
+    card.addEventListener('click', () => {
+      const isFlipped = card.classList.toggle('flipped');
+      card.setAttribute('aria-pressed', String(isFlipped));
+    });
   });
 
   // Envelope

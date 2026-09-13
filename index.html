@@ -493,7 +493,7 @@
       <div class="envelope-flap"></div>
       <div class="envelope-seal">S</div>
     </button>
-    <p class="envelope-hint">tap or press Enter on the envelope</p>
+    <p class="envelope-hint">tap or press Enter or Space on the envelope</p>
     <div class="letter-note" id="letterNote">
       <p>I don't say this enough, so I'm saying it here instead: when you were still around, those long conversations we'd have almost every day were one of my favorite parts of being here. I haven't found anyone else I can talk to like that, about absolutely nothing and somehow never run out of things to say.</p>
       <p>The distance hasn't really changed much, if I'm honest. I still think of things I want to tell you the same way I did when you were a short drive away. I know Cincinnati misses you too — Calhoun especially, probably.</p>
@@ -551,8 +551,8 @@
       piece.style.setProperty('--x', (Math.random() * 180 - 90) + 'px');
       piece.style.setProperty('--r', (Math.random() * 540 - 270) + 'deg');
       piece.style.animationDelay = (Math.random() * 120) + 'ms';
+      piece.addEventListener('animationend', () => piece.remove());
       confettiLayer.appendChild(piece);
-      setTimeout(() => piece.remove(), 1500);
     }
   }
 
@@ -561,10 +561,10 @@
     const now = new Date();
     const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
     const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
-    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const comparisonDate = new Date(birthdayYear, now.getMonth(), now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
-    const isBeforeBirthdayWindow = currentDate < dayDates[0];
-    const isAfterBirthdayWindow = currentDate > dayDates[dayDates.length - 1];
+    const isBeforeBirthdayWindow = now.getFullYear() < birthdayYear || comparisonDate < dayDates[0];
+    const isAfterBirthdayWindow = now.getFullYear() > birthdayYear || comparisonDate > dayDates[dayDates.length - 1];
 
     const params = new URLSearchParams(window.location.search);
     const previewAll = params.get('preview') === 'all';
@@ -573,7 +573,7 @@
       if (previewAll) return true;
       if (isBeforeBirthdayWindow) return false;
       if (isAfterBirthdayWindow) return true;
-      return currentDate >= d;
+      return comparisonDate >= d;
     });
     const openCount = unlocked.filter(Boolean).length;
     const latestUnlockedIndex = previewAll ? 0 : unlocked.lastIndexOf(true);
@@ -588,7 +588,7 @@
 
     document.querySelectorAll('.cal-tile').forEach(tile => {
       const i = parseInt(tile.dataset.day, 10);
-      const isToday = currentDate.getTime() === dayDates[i].getTime();
+      const isToday = comparisonDate.getTime() === dayDates[i].getTime();
       if (unlocked[i]){
         tile.classList.add('unlocked');
         tile.querySelector('.cal-status').textContent = isToday ? 'today' : 'open';
@@ -648,11 +648,11 @@
     }, { threshold: 0.35 });
 
     daySections.forEach(section => sectionObserver.observe(section));
-    if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, { passive: true });
+    if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, false);
   } else {
     document.querySelectorAll('section').forEach(section => section.classList.add('in-view'));
     updateActiveDayTile();
-    if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, { passive: true });
+    if (window.addEventListener) window.addEventListener('scroll', updateActiveDayTile, false);
   }
 
   // Candles

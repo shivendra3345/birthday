@@ -561,16 +561,10 @@
     const now = new Date();
     const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
     const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
-    const comparisonDate = new Date(birthdayYear, birthdayMonthIndex, now.getDate());
+    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
-    const isBeforeBirthdayWindow =
-      now.getFullYear() < birthdayYear ||
-      (now.getFullYear() === birthdayYear && now.getMonth() < birthdayMonthIndex) ||
-      comparisonDate < dayDates[0];
-    const isAfterBirthdayWindow =
-      now.getFullYear() > birthdayYear ||
-      (now.getFullYear() === birthdayYear && now.getMonth() > birthdayMonthIndex) ||
-      comparisonDate > dayDates[dayDates.length - 1];
+    const isBeforeBirthdayWindow = currentDate < dayDates[0];
+    const isAfterBirthdayWindow = currentDate > dayDates[dayDates.length - 1];
 
     const params = new URLSearchParams(window.location.search);
     const previewAll = params.get('preview') === 'all';
@@ -579,7 +573,7 @@
       if (previewAll) return true;
       if (isBeforeBirthdayWindow) return false;
       if (isAfterBirthdayWindow) return true;
-      return comparisonDate >= d;
+      return currentDate >= d;
     });
     const openCount = unlocked.filter(Boolean).length;
     const latestUnlockedIndex = unlocked.lastIndexOf(true);
@@ -594,12 +588,13 @@
 
     document.querySelectorAll('.cal-tile').forEach(tile => {
       const i = parseInt(tile.dataset.day, 10);
-      const isToday = comparisonDate.getTime() === dayDates[i].getTime();
+      const isToday = currentDate.getTime() === dayDates[i].getTime();
       if (unlocked[i]){
         tile.classList.add('unlocked');
         tile.querySelector('.cal-status').textContent = isToday ? 'today' : 'open';
         tile.addEventListener('click', () => {
-          document.querySelector(tile.dataset.target).scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
+          const targetSection = document.querySelector(tile.dataset.target);
+          if (targetSection) targetSection.scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
         });
       } else {
         tile.classList.add('locked');

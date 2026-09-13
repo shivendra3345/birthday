@@ -561,10 +561,10 @@
     const now = new Date();
     const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
     const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
+    const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
-    const isBeforeBirthdayWindow = now.getFullYear() < birthdayYear || (now.getFullYear() === birthdayYear && now.getMonth() < birthdayMonthIndex);
-    const isAfterBirthdayWindow = now.getFullYear() > birthdayYear || (now.getFullYear() === birthdayYear && now.getMonth() > birthdayMonthIndex);
-    const currentDayInBirthdayMonth = now.getDate();
+    const isBeforeBirthdayWindow = currentDate < dayDates[0];
+    const isAfterBirthdayWindow = currentDate > dayDates[dayDates.length - 1];
 
     const params = new URLSearchParams(window.location.search);
     const previewAll = params.get('preview') === 'all';
@@ -573,10 +573,10 @@
       if (previewAll) return true;
       if (isBeforeBirthdayWindow) return false;
       if (isAfterBirthdayWindow) return true;
-      return d.getDate() <= currentDayInBirthdayMonth;
+      return currentDate >= d;
     });
     const openCount = unlocked.filter(Boolean).length;
-    const latestUnlockedIndex = unlocked.lastIndexOf(true);
+    const latestUnlockedIndex = previewAll ? 0 : unlocked.lastIndexOf(true);
 
     if (unlockStatus) unlockStatus.textContent = `${openCount} of ${dayDates.length} surprises unlocked`;
     if (previewAll && previewBadge) previewBadge.hidden = false;
@@ -588,7 +588,7 @@
 
     document.querySelectorAll('.cal-tile').forEach(tile => {
       const i = parseInt(tile.dataset.day, 10);
-      const isToday = !isBeforeBirthdayWindow && !isAfterBirthdayWindow && dayDates[i].getDate() === currentDayInBirthdayMonth;
+      const isToday = currentDate.getTime() === dayDates[i].getTime();
       if (unlocked[i]){
         tile.classList.add('unlocked');
         tile.querySelector('.cal-status').textContent = isToday ? 'today' : 'open';
@@ -608,6 +608,7 @@
         jumpToToday.textContent = 'Surprises unlock soon';
       } else {
         const todayTile = document.querySelector(`.cal-tile[data-day="${latestUnlockedIndex}"]`);
+        if (previewAll) jumpToToday.textContent = 'Start from the first surprise';
         jumpToToday.addEventListener('click', () => {
           if (todayTile) todayTile.click();
         });

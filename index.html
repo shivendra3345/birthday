@@ -201,9 +201,16 @@
   /* ---------------- MENU (flip cards) ---------------- */
   .menu-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:22px; }
   @media (max-width:560px){ .menu-grid{ grid-template-columns:repeat(2,1fr); } }
-  .flip-card{ perspective:1000px; height:170px; }
+  .flip-card{
+    perspective:1000px; height:170px; padding:0; border:none; background:none; width:100%;
+    text-align:inherit;
+  }
   .flip-inner{ position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; cursor:pointer; }
   .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-card:focus-visible .flip-face{
+    outline:3px solid rgba(217,164,65,0.7);
+    outline-offset:4px;
+  }
   .flip-face{
     position:absolute; inset:0; backface-visibility:hidden;
     border:1px solid rgba(34,48,43,0.18); background:linear-gradient(180deg, #fff7e9, var(--paper-soft));
@@ -238,8 +245,15 @@
 
   /* ---------------- LETTER ---------------- */
   .letter-section .ticket-card{ text-align:center; }
-  .envelope{ width:min(300px, 78vw); margin:20px auto 0; position:relative; cursor:pointer; height:190px; transition:transform .25s ease; }
+  .envelope{
+    width:min(300px, 78vw); margin:20px auto 0; position:relative; cursor:pointer; height:190px;
+    transition:transform .25s ease; background:none; border:none; padding:0;
+  }
   .envelope:hover{ transform:translateY(-3px) rotate(-1deg); }
+  .envelope:focus-visible{
+    outline:3px solid rgba(217,164,65,0.7);
+    outline-offset:6px;
+  }
   .envelope-body{ position:absolute; inset:0; background:var(--paper-soft); border:1px solid rgba(34,48,43,0.2); }
   .envelope-flap{
     position:absolute; top:0; left:0; right:0; height:95px;
@@ -286,6 +300,18 @@
     .ticket-card{ padding:32px 24px 28px; border-radius:24px; }
     .hero-actions{ flex-direction:column; align-items:stretch; width:min(100%, 320px); }
     .hero-btn, .ghost-link{ width:100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{
+      animation:none !important;
+      transition:none !important;
+    }
+    section{
+      opacity:1;
+      transform:none;
+    }
   }
 </style>
 </head>
@@ -352,40 +378,40 @@
     <p class="sub">Tap a card to flip it.</p>
     <div class="menu-grid">
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍩</div><div class="title">Glazed donut</div></div>
         <div class="flip-face flip-back"><p>Dunkin, always the glazed one. Non-negotiable.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍣</div><div class="title">Sushi</div></div>
         <div class="flip-face flip-back"><p>The place on McMillan Street. She'd pick it every time.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍰</div><div class="title">Cheesecake</div></div>
         <div class="flip-face flip-back"><p>Or tiramisu, depending on her mood that day.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🛒</div><div class="title">The usual stores</div></div>
         <div class="flip-face flip-back"><p>Trader Joe's, Target, Kenwood — a full afternoon, every time.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🍦</div><div class="title">Ice cream</div></div>
         <div class="flip-face flip-back"><p>Downtown, after a day of walking around Cincinnati.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">🎬</div><div class="title">Movie nights</div></div>
         <div class="flip-face flip-back"><p>Musafir Cafe — "musafir" means traveler, which tracks. Jab Tak Hai Jaan for when a good cry is on the agenda.</p></div>
-      </div></div>
+      </div></button>
 
-      <div class="flip-card"><div class="flip-inner">
+      <button class="flip-card" type="button" aria-label="Flip memory card"><div class="flip-inner">
         <div class="flip-face"><div class="icon">❓</div><div class="title">Her go-to drink</div></div>
         <div class="flip-face flip-back"><p>Still don't remember what it's called. Ask me again and I'll get it wrong.</p></div>
-      </div></div>
+      </div></button>
 
     </div>
   </div>
@@ -452,11 +478,11 @@
   <div class="wrap">
   <div class="ticket-card day-gate">
     <h2>One more thing</h2>
-    <div class="envelope" id="envelope">
+    <button class="envelope" id="envelope" type="button" aria-controls="letterNote" aria-expanded="false" aria-label="Open birthday letter">
       <div class="envelope-body"></div>
       <div class="envelope-flap"></div>
       <div class="envelope-seal">S</div>
-    </div>
+    </button>
     <p class="envelope-hint">tap the envelope</p>
     <div class="letter-note" id="letterNote">
       <p>I don't say this enough, so I'm saying it here instead: when you were still around, those long conversations we'd have almost every day were one of my favorite parts of being here. I haven't found anyone else I can talk to like that, about absolutely nothing and somehow never run out of things to say.</p>
@@ -502,9 +528,10 @@
   const unlockStatus = document.getElementById('unlockStatus');
   const previewBadge = document.getElementById('previewBadge');
   const jumpToToday = document.getElementById('jumpToToday');
+  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function burstConfetti(count = 20){
-    if (!confettiLayer) return;
+    if (!confettiLayer || reduceMotion) return;
     const colors = ['#D9A441', '#B5482A', '#F3E7CE', '#A9C0B7'];
     for (let i = 0; i < count; i++){
       const piece = document.createElement('span');
@@ -547,7 +574,7 @@
         tile.classList.add('unlocked');
         tile.querySelector('.cal-status').textContent = isToday ? 'today' : 'open';
         tile.addEventListener('click', () => {
-          document.querySelector(tile.dataset.target).scrollIntoView({behavior:'smooth'});
+          document.querySelector(tile.dataset.target).scrollIntoView({behavior: reduceMotion ? 'auto' : 'smooth'});
         });
       } else {
         tile.classList.add('locked');
@@ -606,15 +633,19 @@
   // Envelope
   const envelope = document.getElementById('envelope');
   const letterNote = document.getElementById('letterNote');
-  envelope.addEventListener('click', () => {
-    envelope.classList.toggle('open');
-    if (envelope.classList.contains('open')){
-      burstConfetti(16);
-      setTimeout(() => letterNote.classList.add('show'), 350);
-    } else {
-      letterNote.classList.remove('show');
-    }
-  });
+  if (envelope && letterNote){
+    envelope.addEventListener('click', () => {
+      envelope.classList.toggle('open');
+      const isOpen = envelope.classList.contains('open');
+      envelope.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen){
+        burstConfetti(16);
+        setTimeout(() => letterNote.classList.add('show'), 350);
+      } else {
+        letterNote.classList.remove('show');
+      }
+    });
+  }
 </script>
 
 </body>

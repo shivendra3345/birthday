@@ -561,10 +561,16 @@
     const now = new Date();
     const birthdayYear = Number(document.body.dataset.birthdayYear || now.getFullYear());
     const birthdayMonthIndex = Number(document.body.dataset.birthdayMonth || 9) - 1;
-    const comparisonDate = new Date(birthdayYear, now.getMonth(), now.getDate());
+    const comparisonDate = new Date(birthdayYear, birthdayMonthIndex, now.getDate());
     const dayDates = [13,14,15,16,17].map(d => new Date(birthdayYear, birthdayMonthIndex, d));
-    const isBeforeBirthdayWindow = now.getFullYear() < birthdayYear || comparisonDate < dayDates[0];
-    const isAfterBirthdayWindow = now.getFullYear() > birthdayYear || comparisonDate > dayDates[dayDates.length - 1];
+    const isBeforeBirthdayWindow =
+      now.getFullYear() < birthdayYear ||
+      (now.getFullYear() === birthdayYear && now.getMonth() < birthdayMonthIndex) ||
+      comparisonDate < dayDates[0];
+    const isAfterBirthdayWindow =
+      now.getFullYear() > birthdayYear ||
+      (now.getFullYear() === birthdayYear && now.getMonth() > birthdayMonthIndex) ||
+      comparisonDate > dayDates[dayDates.length - 1];
 
     const params = new URLSearchParams(window.location.search);
     const previewAll = params.get('preview') === 'all';
@@ -576,7 +582,7 @@
       return comparisonDate >= d;
     });
     const openCount = unlocked.filter(Boolean).length;
-    const latestUnlockedIndex = previewAll ? 0 : unlocked.lastIndexOf(true);
+    const latestUnlockedIndex = unlocked.lastIndexOf(true);
 
     if (unlockStatus) unlockStatus.textContent = `${openCount} of ${dayDates.length} surprises unlocked`;
     if (previewAll && previewBadge) previewBadge.hidden = false;
@@ -608,7 +614,7 @@
         jumpToToday.textContent = 'Surprises unlock soon';
       } else {
         const todayTile = document.querySelector(`.cal-tile[data-day="${latestUnlockedIndex}"]`);
-        if (previewAll) jumpToToday.textContent = 'Start from the first surprise';
+        if (previewAll) jumpToToday.textContent = 'Open the latest surprise';
         jumpToToday.addEventListener('click', () => {
           if (todayTile) todayTile.click();
         });
@@ -626,6 +632,7 @@
   const updateActiveDayTile = () => {
     let activeSection = null;
     daySections.forEach(section => {
+      if (section.classList.contains('is-locked')) return;
       const rect = section.getBoundingClientRect();
       const visible = rect.bottom > 0 && rect.top < window.innerHeight;
       if (!visible) return;

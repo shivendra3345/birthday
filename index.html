@@ -1,137 +1,476 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday!</title>
-  <style>
-    :root {
-      color-scheme: light;
-      --bg-start: #fff1f2;
-      --bg-end: #e0f2fe;
-      --card-bg: rgba(255, 255, 255, 0.88);
-      --text-main: #1f2937;
-      --text-soft: #4b5563;
-      --accent: #ec4899;
-      --accent-dark: #db2777;
-      --shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One ticket, just for you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Work+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#153833;
+    --teal-2:#1E4A43;
+    --paper:#F3E7CE;
+    --paper-soft:#FBF3E1;
+    --rust:#B5482A;
+    --gold:#D9A441;
+    --ink:#22302B;
+    --ink-soft:#4C5C54;
+    --cream-text:#F3E7CE;
+    --cream-text-muted:#A9C0B7;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0;
+    background:var(--teal);
+    color:var(--cream-text);
+    font-family:'Work Sans', sans-serif;
+    line-height:1.6;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; margin:0; font-weight:500; }
+  .hand{ font-family:'Caveat', cursive; }
+  .mono{ font-family:'Space Mono', monospace; }
+  .wrap{ max-width:860px; margin:0 auto; padding:0 24px; }
+  section{ padding:84px 0; position:relative; }
+  button{ font-family:inherit; cursor:pointer; }
 
-    * {
-      box-sizing: border-box;
-    }
+  /* ---------------- HERO ---------------- */
+  .hero{
+    min-height:88vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    padding:40px 24px;
+  }
+  .ticket-code{
+    font-family:'Space Mono',monospace; font-size:12.5px; letter-spacing:0.08em;
+    color:var(--gold); margin-bottom:22px;
+  }
+  .hero h1{ font-size:clamp(36px, 6.5vw, 58px); max-width:640px; color:var(--paper-soft); }
+  .hero p{ font-size:17px; color:var(--cream-text-muted); max-width:420px; margin:18px auto 0; }
+  .perf-line{
+    width:100%; max-width:400px; height:1px; margin:34px auto 0;
+    background-image:repeating-linear-gradient(90deg, var(--cream-text-muted) 0 6px, transparent 6px 12px);
+    opacity:0.5;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      font-family: Arial, Helvetica, sans-serif;
-      color: var(--text-main);
-      background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
-    }
+  /* ---------------- CALENDAR ---------------- */
+  .calendar-strip{ display:flex; gap:10px; margin-top:34px; flex-wrap:wrap; justify-content:center; }
+  .cal-tile{
+    width:64px; height:76px; background:var(--paper); border:1px dashed var(--ink-soft);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    transition:transform .2s, border-color .2s; color:var(--ink);
+  }
+  .cal-tile .cal-date{ font-family:'Space Mono',monospace; font-size:14px; }
+  .cal-tile .cal-icon{ font-size:19px; }
+  .cal-tile .cal-status{ font-family:'Caveat',cursive; font-size:12.5px; color:var(--ink-soft); height:14px; }
+  .cal-tile.locked{ opacity:0.35; cursor:default; background:var(--teal-2); border-color:var(--cream-text-muted); }
+  .cal-tile.locked .cal-status{ color:var(--cream-text-muted); }
+  .cal-tile.unlocked{ border:1px solid var(--rust); cursor:pointer; }
+  .cal-tile.unlocked:hover{ transform:translateY(-3px); }
+  .cal-tile.is-today{ box-shadow:0 0 0 2px var(--gold); }
 
-    .card {
-      width: min(100%, 720px);
-      padding: 48px 32px;
-      border-radius: 28px;
-      text-align: center;
-      background: var(--card-bg);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(10px);
-    }
+  /* ---------------- SECTION CARD SHELL ---------------- */
+  .card-section{ display:flex; justify-content:center; }
+  .ticket-card{
+    background:var(--paper); color:var(--ink);
+    max-width:600px; width:100%; padding:40px 40px 36px;
+    box-shadow:0 12px 34px rgba(0,0,0,0.28);
+  }
+  .ticket-card h2{ font-size:28px; margin-bottom:6px; }
+  .ticket-card .sub{ color:var(--ink-soft); font-size:15px; margin-bottom:8px; }
 
-    .emoji {
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      margin-bottom: 12px;
-      animation: float 2.6s ease-in-out infinite;
-    }
+  /* ---------------- DAY LOCK ---------------- */
+  section.is-locked .day-gate{ display:none; }
+  .day-locked{ display:none; }
+  section.is-locked .day-locked{ display:flex; justify-content:center; }
+  .lock-card{
+    max-width:340px; width:100%; padding:34px 28px; text-align:center;
+    background:var(--teal-2); border:1px dashed var(--cream-text-muted);
+  }
+  .lock-card .lock-icon{ font-size:24px; margin-bottom:10px; }
+  .lock-card p{ margin:0; color:var(--cream-text-muted); font-size:14.5px; }
 
-    h1 {
-      margin: 0;
-      font-size: clamp(2.2rem, 7vw, 4.5rem);
-      line-height: 1.1;
-    }
+  /* ---------------- CAKE ---------------- */
+  .cake-section .ticket-card{ text-align:center; }
+  .cake-stage{ display:flex; flex-direction:column; align-items:center; margin-top:20px; }
+  .candles{ display:flex; gap:16px; margin-bottom:-6px; z-index:2; position:relative; }
+  .candle-btn{ background:none; border:none; padding:0; width:20px; display:flex; flex-direction:column; align-items:center; }
+  .flame{
+    width:9px; height:15px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    background:radial-gradient(circle at 50% 30%, #FFE9A8, var(--gold) 55%, var(--rust) 100%);
+    margin-bottom:2px; transition:opacity .25s, transform .25s;
+    animation:flicker 1.6s ease-in-out infinite;
+  }
+  @keyframes flicker{ 0%,100%{ transform:scaleY(1) rotate(-1deg);} 50%{ transform:scaleY(1.08) rotate(2deg);} }
+  .candle-btn.out .flame{ opacity:0; transform:scale(0.4); animation:none; }
+  .candle-stick{ width:5px; height:30px; background:linear-gradient(var(--paper-soft), #DCC9A0); border:1px solid rgba(34,48,43,0.25); }
+  .cake-svg{ width:min(320px, 78vw); height:auto; }
+  .cake-hint{ font-size:13.5px; color:var(--ink-soft); margin-top:16px; }
+  .wish-reveal{
+    max-width:420px; margin:30px auto 0; padding:22px 26px;
+    background:var(--paper-soft); border-left:3px solid var(--rust);
+    opacity:0; transform:translateY(10px); transition:opacity .5s, transform .5s; text-align:left;
+  }
+  .wish-reveal.show{ opacity:1; transform:translateY(0); }
+  .wish-reveal p{ font-size:16px; margin:0; }
+  .wish-reveal .sign{ display:block; margin-top:10px; font-family:'Caveat', cursive; font-size:19px; color:var(--rust); }
 
-    .name {
-      color: var(--accent-dark);
-    }
+  /* ---------------- MENU (flip cards) ---------------- */
+  .menu-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:22px; }
+  @media (max-width:560px){ .menu-grid{ grid-template-columns:repeat(2,1fr); } }
+  .flip-card{ perspective:1000px; height:170px; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .6s; transform-style:preserve-3d; cursor:pointer; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border:1px solid rgba(34,48,43,0.18); background:var(--paper-soft);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:14px; text-align:center;
+  }
+  .flip-face .icon{ font-size:30px; margin-bottom:8px; }
+  .flip-face .title{ font-family:'Fraunces',serif; font-size:15px; }
+  .flip-back{ transform:rotateY(180deg); background:var(--teal); color:var(--cream-text); }
+  .flip-back p{ font-size:12.5px; margin:0; }
 
-    p {
-      margin: 18px auto 0;
-      max-width: 34rem;
-      font-size: 1.1rem;
-      line-height: 1.7;
-      color: var(--text-soft);
-    }
+  /* ---------------- TICKETS (postcards reimagined) ---------------- */
+  .ticket-strip{ display:flex; gap:22px; overflow-x:auto; padding:24px 4px 10px; }
+  .memory-ticket{
+    flex:0 0 240px; background:var(--paper-soft); position:relative;
+    padding:16px 18px 18px; border:1px solid rgba(34,48,43,0.15);
+  }
+  .memory-ticket::before{
+    content:''; position:absolute; left:-7px; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; border-radius:50%; background:var(--teal);
+  }
+  .memory-ticket::after{
+    content:''; position:absolute; right:-7px; top:50%; transform:translateY(-50%);
+    width:14px; height:14px; border-radius:50%; background:var(--teal);
+  }
+  .t-no{ font-family:'Space Mono',monospace; font-size:10.5px; color:var(--rust); margin-bottom:10px; }
+  .t-route{ font-size:13px; margin-bottom:4px; }
+  .t-route b{ font-family:'Space Mono',monospace; font-weight:400; }
+  .t-cap{ font-family:'Caveat',cursive; font-size:18px; margin-top:10px; border-top:1px dashed rgba(34,48,43,0.25); padding-top:8px; }
 
-    button {
-      margin-top: 28px;
-      border: 0;
-      border-radius: 999px;
-      padding: 14px 24px;
-      font-size: 1rem;
-      font-weight: 700;
-      color: #fff;
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      box-shadow: 0 12px 24px rgba(236, 72, 153, 0.3);
-    }
+  /* ---------------- LETTER ---------------- */
+  .letter-section .ticket-card{ text-align:center; }
+  .envelope{ width:min(300px, 78vw); margin:20px auto 0; position:relative; cursor:pointer; height:190px; }
+  .envelope-body{ position:absolute; inset:0; background:var(--paper-soft); border:1px solid rgba(34,48,43,0.2); }
+  .envelope-flap{
+    position:absolute; top:0; left:0; right:0; height:95px;
+    background:#E4D2A5; border:1px solid rgba(34,48,43,0.2);
+    clip-path:polygon(0 0, 100% 0, 50% 100%);
+    transform-origin:top; transition:transform .5s; z-index:3;
+  }
+  .envelope.open .envelope-flap{ transform:rotateX(180deg); }
+  .envelope-seal{
+    position:absolute; top:74px; left:50%; transform:translateX(-50%);
+    width:32px; height:32px; border-radius:50%; background:var(--rust); color:var(--paper);
+    display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:15px; z-index:4;
+  }
+  .envelope.open .envelope-seal{ opacity:0; }
+  .letter-note{
+    max-width:440px; margin:26px auto 0; background:var(--paper-soft);
+    border-left:3px solid var(--rust); padding:26px 30px; text-align:left;
+    opacity:0; transform:translateY(14px); transition:opacity .5s, transform .5s;
+  }
+  .letter-note.show{ opacity:1; transform:translateY(0); }
+  .letter-note p{ font-size:15.5px; margin:0 0 14px; }
+  .letter-note p:last-of-type{ margin-bottom:0; }
+  .letter-note .sign{ display:block; margin-top:16px; font-family:'Caveat', cursive; font-size:21px; color:var(--rust); }
+  .envelope-hint{ margin-top:14px; font-family:'Caveat', cursive; font-size:17px; color:var(--ink-soft); }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 16px 30px rgba(236, 72, 153, 0.35);
-    }
-
-    button:focus-visible {
-      outline: 3px solid rgba(139, 92, 246, 0.35);
-      outline-offset: 4px;
-    }
-
-    .surprise {
-      min-height: 1.8rem;
-      margin-top: 18px;
-      font-weight: 700;
-      color: var(--accent-dark);
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
-    }
-  </style>
+  /* ---------------- CLOSING / BOARDING PASS ---------------- */
+  .closing .ticket-card{ text-align:left; }
+  .boarding-pass{
+    margin-top:24px; background:var(--teal); color:var(--cream-text);
+    padding:24px 26px; position:relative; overflow:hidden;
+  }
+  .boarding-pass::before{
+    content:'BOARDING PASS'; position:absolute; top:10px; right:16px;
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.1em; color:var(--gold); opacity:0.8;
+  }
+  .bp-row{ display:flex; justify-content:space-between; gap:16px; margin-bottom:14px; flex-wrap:wrap; }
+  .bp-field{ font-family:'Space Mono',monospace; font-size:11px; color:var(--cream-text-muted); margin-bottom:3px; }
+  .bp-value{ font-family:'Fraunces',serif; font-size:16px; }
+  .bp-note{ font-size:14.5px; color:var(--cream-text-muted); margin-top:10px; border-top:1px dashed rgba(243,231,206,0.25); padding-top:14px; }
+  .closing-sign{ display:block; margin-top:22px; font-family:'Caveat',cursive; font-size:20px; color:var(--rust); }
+</style>
 </head>
 <body>
-  <main class="card">
-    <div class="emoji" aria-hidden="true">🎉🎂🎈</div>
-    <h1>Happy Birthday, <span class="name">My Dear Friend</span>!</h1>
-    <p>
-      Wishing you a day filled with smiles, laughter, cake, and all the happiness you deserve.
-      May this year bring you unforgettable memories and countless reasons to celebrate.
-    </p>
-    <button type="button" id="surprise-button">Open a Birthday Surprise</button>
-    <div class="surprise" id="surprise-message" aria-live="polite"></div>
-  </main>
 
-  <script>
-    const messages = [
-      "You make life brighter just by being in it ✨",
-      "Hope your birthday is as amazing as you are 💖",
-      "Cheers to more fun, joy, and beautiful memories 🎊"
-    ];
+<section class="hero">
+  <div class="ticket-code mono">TICKET NO. 09-17 &middot; ONE PASSENGER</div>
+  <h1>One ticket, just for you.</h1>
+  <p>This unlocks in pieces — a little more each day until the 17th. Check back daily.</p>
+  <div class="calendar-strip" id="calendarStrip">
+    <button class="cal-tile" data-day="0" data-target="#cake"><span class="cal-date mono">13</span><span class="cal-icon">🕯️</span><span class="cal-status"></span></button>
+    <button class="cal-tile" data-day="1" data-target="#menu"><span class="cal-date mono">14</span><span class="cal-icon">🍩</span><span class="cal-status"></span></button>
+    <button class="cal-tile" data-day="2" data-target="#tickets"><span class="cal-date mono">15</span><span class="cal-icon">🎫</span><span class="cal-status"></span></button>
+    <button class="cal-tile" data-day="3" data-target="#letter"><span class="cal-date mono">16</span><span class="cal-icon">✉️</span><span class="cal-status"></span></button>
+    <button class="cal-tile" data-day="4" data-target="#closing"><span class="cal-date mono">17</span><span class="cal-icon">🎂</span><span class="cal-status"></span></button>
+  </div>
+  <div class="perf-line"></div>
+</section>
 
-    let messageIndex = 0;
+<section class="cake-section card-section" id="cake" data-day="0">
+  <div class="wrap">
+  <div class="ticket-card day-gate">
+    <h2>Make a wish</h2>
+    <p class="sub">Tap each candle to blow it out.</p>
+    <div class="cake-stage">
+      <div class="candles" id="candles">
+        <button class="candle-btn" data-i="0"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="1"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="2"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="3"><div class="flame"></div><div class="candle-stick"></div></button>
+        <button class="candle-btn" data-i="4"><div class="flame"></div><div class="candle-stick"></div></button>
+      </div>
+      <svg class="cake-svg" viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+        <rect x="40" y="90" width="220" height="50" rx="6" fill="#FBF3E1" stroke="#22302B" stroke-opacity="0.2"/>
+        <rect x="40" y="90" width="220" height="14" fill="#D9A441" opacity="0.55"/>
+        <rect x="55" y="60" width="190" height="34" rx="6" fill="#FBF3E1" stroke="#22302B" stroke-opacity="0.2"/>
+        <rect x="55" y="60" width="190" height="12" fill="#B5482A" opacity="0.4"/>
+        <circle cx="90" cy="88" r="4" fill="#153833"/>
+        <circle cx="130" cy="88" r="4" fill="#B5482A"/>
+        <circle cx="170" cy="88" r="4" fill="#D9A441"/>
+        <circle cx="210" cy="88" r="4" fill="#153833"/>
+      </svg>
+      <p class="cake-hint" id="cakeHint">5 candles left</p>
+      <div class="wish-reveal" id="wishReveal">
+        <p>I wished for a lot more days like the ones we've already had — cooking something up, walking nowhere in particular, and talking about everything.</p>
+        <span class="sign hand">Happy birthday. I mean every word.</span>
+      </div>
+    </div>
+  </div>
+  <div class="day-locked"><div class="lock-card"><div class="lock-icon">🔒</div><p>This one unlocks on Sep 13.</p></div></div>
+  </div>
+</section>
 
-    document.getElementById("surprise-button").addEventListener("click", () => {
-      document.getElementById("surprise-message").textContent = messages[messageIndex];
-      messageIndex = (messageIndex + 1) % messages.length;
+<section class="menu-section card-section" id="menu" data-day="1">
+  <div class="wrap">
+  <div class="ticket-card day-gate">
+    <h2>Her usual order</h2>
+    <p class="sub">Tap a card to flip it.</p>
+    <div class="menu-grid">
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🍩</div><div class="title">Glazed donut</div></div>
+        <div class="flip-face flip-back"><p>Dunkin, always the glazed one. Non-negotiable.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🍣</div><div class="title">Sushi</div></div>
+        <div class="flip-face flip-back"><p>The place on McMillan Street. She'd pick it every time.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🍰</div><div class="title">Cheesecake</div></div>
+        <div class="flip-face flip-back"><p>Or tiramisu, depending on her mood that day.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🛒</div><div class="title">The usual stores</div></div>
+        <div class="flip-face flip-back"><p>Trader Joe's, Target, Kenwood — a full afternoon, every time.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🍦</div><div class="title">Ice cream</div></div>
+        <div class="flip-face flip-back"><p>Downtown, after a day of walking around Cincinnati.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">🎬</div><div class="title">Movie nights</div></div>
+        <div class="flip-face flip-back"><p>Musafir Cafe — "musafir" means traveler, which tracks. Jab Tak Hai Jaan for when a good cry is on the agenda.</p></div>
+      </div></div>
+
+      <div class="flip-card"><div class="flip-inner">
+        <div class="flip-face"><div class="icon">❓</div><div class="title">Her go-to drink</div></div>
+        <div class="flip-face flip-back"><p>Still don't remember what it's called. Ask me again and I'll get it wrong.</p></div>
+      </div></div>
+
+    </div>
+  </div>
+  <div class="day-locked"><div class="lock-card"><div class="lock-icon">🔒</div><p>This one unlocks on Sep 14.</p></div></div>
+  </div>
+</section>
+
+<section class="tickets-section card-section" id="tickets" data-day="2">
+  <div class="wrap">
+  <div class="ticket-card day-gate">
+    <h2>A few tickets we've kept</h2>
+    <p class="sub">Swap the routes for real photos whenever you're ready.</p>
+    <div class="ticket-strip">
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 001</div>
+        <div class="t-route"><b class="mono">FROM</b> our kitchen &nbsp; <b class="mono">TO</b> wherever the recipe took us</div>
+        <div class="t-cap hand">cooking something up, again</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 002</div>
+        <div class="t-route"><b class="mono">FROM</b> nowhere &nbsp; <b class="mono">TO</b> nowhere in particular</div>
+        <div class="t-cap hand">our usual walk</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 003</div>
+        <div class="t-route"><b class="mono">FROM</b> home &nbsp; <b class="mono">TO</b> downtown Cincinnati</div>
+        <div class="t-cap hand">the day trip downtown</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 004</div>
+        <div class="t-route"><b class="mono">FROM</b> fountain square &nbsp; <b class="mono">TO</b> one cone each</div>
+        <div class="t-cap hand">ice cream after all that walking</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 005</div>
+        <div class="t-route"><b class="mono">FROM</b> platform A &nbsp; <b class="mono">TO</b> platform B (does it matter?)</div>
+        <div class="t-cap hand">the train ride</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 006</div>
+        <div class="t-route"><b class="mono">FROM</b> Bellevue Park &nbsp; <b class="mono">TO</b> Bellevue Park, again</div>
+        <div class="t-cap hand">once wasn't enough</div>
+      </div>
+
+      <div class="memory-ticket">
+        <div class="t-no mono">NO. 007</div>
+        <div class="t-route"><b class="mono">FROM</b> Calhoun &nbsp; <b class="mono">TO</b> wherever you are now</div>
+        <div class="t-cap hand">still feels like home</div>
+      </div>
+
+    </div>
+  </div>
+  <div class="day-locked"><div class="lock-card"><div class="lock-icon">🔒</div><p>This one unlocks on Sep 15.</p></div></div>
+  </div>
+</section>
+
+<section class="letter-section card-section" id="letter" data-day="3">
+  <div class="wrap">
+  <div class="ticket-card day-gate">
+    <h2>One more thing</h2>
+    <div class="envelope" id="envelope">
+      <div class="envelope-body"></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal">S</div>
+    </div>
+    <p class="envelope-hint">tap the envelope</p>
+    <div class="letter-note" id="letterNote">
+      <p>I don't say this enough, so I'm saying it here instead: when you were still around, those long conversations we'd have almost every day were one of my favorite parts of being here. I haven't found anyone else I can talk to like that, about absolutely nothing and somehow never run out of things to say.</p>
+      <p>The distance hasn't really changed much, if I'm honest. I still think of things I want to tell you the same way I did when you were a short drive away. I know Cincinnati misses you too — Calhoun especially, probably.</p>
+      <p>So today's just a reminder: you're missed more than you probably realize, and you're one of the people I'm most grateful to call a friend.</p>
+      <span class="sign hand">Happy birthday. Call me when you get a chance.</span>
+    </div>
+  </div>
+  <div class="day-locked"><div class="lock-card"><div class="lock-icon">🔒</div><p>This one unlocks on Sep 16.</p></div></div>
+  </div>
+</section>
+
+<section class="closing card-section" id="closing" data-day="4">
+  <div class="wrap">
+  <div class="ticket-card day-gate">
+    <h2>That's it. That's the whole thing.</h2>
+    <p class="sub">Made with a few memories, a lot of appreciation, and no help from you at all.</p>
+    <div class="boarding-pass">
+      <div class="bp-row">
+        <div><div class="bp-field">PASSENGER</div><div class="bp-value">Friend</div></div>
+        <div><div class="bp-field">DATE</div><div class="bp-value">Sep 17</div></div>
+      </div>
+      <div class="bp-row">
+        <div><div class="bp-field">FROM</div><div class="bp-value">Everything you've already done</div></div>
+      </div>
+      <div class="bp-row">
+        <div><div class="bp-field">TO</div><div class="bp-value">Wherever the CAT takes you</div></div>
+      </div>
+      <div class="bp-row">
+        <div><div class="bp-field">GATE</div><div class="bp-value">Confidence</div></div>
+        <div><div class="bp-field">SEAT</div><div class="bp-value">Already earned</div></div>
+      </div>
+      <p class="bp-note">However this next one goes, you've already proven you can land anywhere. Go get it.</p>
+    </div>
+    <span class="closing-sign hand">Happy birthday. Always in your corner.</span>
+  </div>
+  <div class="day-locked"><div class="lock-card"><div class="lock-icon">🎂</div><p>The last part unlocks on your birthday — Sep 17.</p></div></div>
+  </div>
+</section>
+
+<script>
+  // Day-by-day unlock logic (Sep 13 -> Sep 17)
+  (function(){
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dayDates = [13,14,15,16,17].map(d => new Date(now.getFullYear(), 8, d)); // September
+
+    // Preview mode: open the file with ?preview=all at the end of the URL
+    // to see every section unlocked, without changing anything for the real link.
+    const params = new URLSearchParams(window.location.search);
+    const previewAll = params.get('preview') === 'all';
+
+    const unlocked = dayDates.map(d => previewAll ? true : d <= today);
+
+    document.querySelectorAll('section[data-day]').forEach(section => {
+      const i = parseInt(section.dataset.day, 10);
+      if (!unlocked[i]) section.classList.add('is-locked');
     });
-  </script>
+
+    document.querySelectorAll('.cal-tile').forEach(tile => {
+      const i = parseInt(tile.dataset.day, 10);
+      const isToday = dayDates[i].getTime() === today.getTime();
+      if (unlocked[i]){
+        tile.classList.add('unlocked');
+        tile.querySelector('.cal-status').textContent = isToday ? 'today' : 'open';
+        tile.addEventListener('click', () => {
+          document.querySelector(tile.dataset.target).scrollIntoView({behavior:'smooth'});
+        });
+      } else {
+        tile.classList.add('locked');
+        tile.disabled = true;
+      }
+      if (isToday) tile.classList.add('is-today');
+    });
+  })();
+
+  // Candles
+  const candleButtons = document.querySelectorAll('.candle-btn');
+  const cakeHint = document.getElementById('cakeHint');
+  const wishReveal = document.getElementById('wishReveal');
+  let blownOut = 0;
+
+  candleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('out')) return;
+      btn.classList.add('out');
+      blownOut++;
+      const remaining = candleButtons.length - blownOut;
+      cakeHint.textContent = remaining > 0 ? remaining + ' candle' + (remaining === 1 ? '' : 's') + ' left' : 'Wish made.';
+      if (blownOut === candleButtons.length){
+        setTimeout(() => wishReveal.classList.add('show'), 300);
+      }
+    });
+  });
+
+  // Flip cards
+  document.querySelectorAll('.flip-card').forEach(card => {
+    card.addEventListener('click', () => card.classList.toggle('flipped'));
+  });
+
+  // Envelope
+  const envelope = document.getElementById('envelope');
+  const letterNote = document.getElementById('letterNote');
+  envelope.addEventListener('click', () => {
+    envelope.classList.toggle('open');
+    if (envelope.classList.contains('open')){
+      setTimeout(() => letterNote.classList.add('show'), 350);
+    } else {
+      letterNote.classList.remove('show');
+    }
+  });
+</script>
+
 </body>
 </html>
